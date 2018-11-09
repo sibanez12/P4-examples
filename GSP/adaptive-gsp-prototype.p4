@@ -25,6 +25,7 @@ limitations under the License.
  *   - instantaneous queue sizes
  *   - approximate division operation
  *   - the last time the buffer dropped a packet as a result of overflow
+ *   - (optional) estimated queueing delay
  */
 
 typedef bit<9> queueId_t;
