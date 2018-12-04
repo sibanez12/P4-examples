@@ -10,7 +10,7 @@ Primitives:
 * periodic reset
 
 Also see:
-* [Adaptive GSP prototype](/GSP/adaptive-gsp-prototype.p4) which
+* [Adaptive GSP prototype](/AQM/GSP/adaptive-gsp-prototype.p4) which
   needs to track the amount of time that the queue size spends
   above and below some threshold value
 * [AFD prototype](https://github.com/PIFO-TM/ns3-bmv2/blob/master/traffic-control/examples/p4-src/afd/afd.p4)
