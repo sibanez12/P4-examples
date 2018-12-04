@@ -3,7 +3,7 @@ A few small examples to demonstrate the usefulness of having a
 time reference in P4 programs.
 
 Primitives:
-* sum of samples over a sliding window
+* [Sum of samples over a sliding window](window-sum.p4)
 * average of samples over a sliding window
 * token buckets
 * decaying counter
