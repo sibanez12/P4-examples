@@ -7,7 +7,7 @@ Primitives:
 * [Average of samples over a sliding window](window-avg.p4)
 * [Token buckets](token-bucket.p4)
 * [Decaying counter](counter-decay.p4)
-* Periodic reset
+* [Resetting register array](register-reset.p4)
 
 Also see:
 * [Adaptive GSP prototype](/AQM/GSP/adaptive-gsp-prototype.p4) which
