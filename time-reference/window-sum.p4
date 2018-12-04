@@ -17,22 +17,29 @@ limitations under the License.
 
 typedef bit<32> uint_t;
 
+const uint_t NUM_SAMPLES = 64;
+const uint_t LOG_NUM_SAMPLES = 6;
+
+/*
+ * The @always(PERIOD [, default_values]) annotation indicates that
+ * this control block is executed deterministically every PERIOD.
+ * If the control block has any inputs then default values must be
+ * supplied.
+ */
+@always(1ns, sample=0)
 control window_sum(in uint_t sample,
                    out uint_t result)
 {
     // externs
     register<uint_t>(1) sum_reg;
-    // shift register parameters:
-    //   depth - number of samples held by the shift register
-    shift_register<uint_t> (100) shift_reg;
+    shift_register<uint_t> (NUM_SAMPLES) shift_reg;
 
     // metadata
     uint_t sum;
     uint_t out_sample;
 
     apply {
-        // this apply block is executed every PKT_TIME ns
-        @atomic {
+        @atomic(100ns) {
             sum = sum_reg.read();
             sum = sum |+| sample;
             out_sample = shift_reg.shift(sample);

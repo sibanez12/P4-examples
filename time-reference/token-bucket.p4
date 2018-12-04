@@ -20,6 +20,8 @@ typedef bit<32> uint_t;
 const uint_t FILL_RATE = 10; // tokens / slot
 const uint_t MAX_TOKENS = 1000;
 
+// This control block is executed deterministically every 1ns
+@always(1ns, request=0)
 control token_bucket(in uint_t request, // number of requested tokens
                      out bool result)
 {
@@ -30,7 +32,6 @@ control token_bucket(in uint_t request, // number of requested tokens
     uint_t tokens;
 
     apply {
-        // this apply block is executed deterministically every SLOT 
         @atomic {
             tokens = tokens_reg.read();
             // update tokens

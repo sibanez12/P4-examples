@@ -4,10 +4,10 @@ time reference in P4 programs.
 
 Primitives:
 * [Sum of samples over a sliding window](window-sum.p4)
-* average of samples over a sliding window
-* token buckets
-* decaying counter
-* periodic reset
+* [Average of samples over a sliding window](window-avg.p4)
+* [Token buckets](token-bucket.p4)
+* [Decaying counter](counter-decay.p4)
+* Periodic reset
 
 Also see:
 * [Adaptive GSP prototype](/AQM/GSP/adaptive-gsp-prototype.p4) which

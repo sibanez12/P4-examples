@@ -15,13 +15,17 @@ limitations under the License.
  * Compute average over a sliding window 
  */
 
-#include "division.p4"
-
 typedef bit<32> uint_t;
 
 const uint_t NUM_SAMPLES = 64;
 const uint_t LOG_NUM_SAMPLES = 6;
 
+/*
+ * The @always(PERIOD [, default_values]) annotation indicates that
+ * this control block is executed deterministically every PERIOD.
+ * If the control block has any inputs then default values must be
+ * supplied.
+ */
 @always(1ns, sample=0)
 control window_avg(in uint_t sample,
                    out uint_t result)
@@ -35,7 +39,21 @@ control window_avg(in uint_t sample,
     uint_t out_sample;
 
     apply {
-        // this apply block is executed every nanosecond
+        /* Note that the @atomic annotation has been modified so that
+         * it consumes an input parameter. This input parameter indicates
+         * a maximum desired limit on the pipeline depth used for this
+         * atomic operation. The original @atomic annotation (without any
+         * input parameters) tells the compiler that this operation must
+         * be completed atomically for each packet. For some algorithms
+         * this requirement is too strict and we would be willing to 
+         * sacrifice atomicity for additional computation time. So the
+         * additional parameter allows the P4 programmer to hint to the
+         * compiler that it is in fact ok to pipeline the stateful
+         * operation.
+         * In the example below, we indicate that the stateful operation
+         * should be completed within 100ns because it is ok if packets
+         * read stale values of the average value.
+         */
         @atomic(100ns) {
             sum = sum_reg.read();
             sum = sum |+| sample;
