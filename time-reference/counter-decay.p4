@@ -19,8 +19,10 @@ typedef bit<32> uint_t;
 
 const uint_t DECAY_RATE = 10;
 
-@always(1ns, sample=0)
-control counter_decay(in uint_t sample,
+// This control block is executed deterministically every 1ns
+@periodic(1ns)
+control counter_decay(in bool timer_trigger,
+                      in uint_t sample,
                       out uint_t result)
 {
     // externs
@@ -30,7 +32,9 @@ control counter_decay(in uint_t sample,
     uint_t counter;
 
     apply {
-        // this apply block is executed deterministically every 1ns
+        if (timer_trigger) {
+            sample = 0;
+        }
         @atomic {
             counter = counter_reg.read();
             counter = (counter |+| sample) |-| DECAY_RATE;

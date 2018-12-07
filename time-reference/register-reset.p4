@@ -33,8 +33,9 @@ const state_t WRITE = 0;
 const state_t RESET = 1;
 
 // This control block is executed deterministically every 1ns
-@always(1ns, opCode=READ, index=0, value=0, reset=false)
-control register_reset(in opCode_t opCode,  // READ or WRITE
+@periodic(1ns)
+control register_reset(in bool timer_trigger,
+                       in opCode_t opCode,  // READ or WRITE
                        in index_t index,    // index to access
                        in uint_t value,     // value to write
                        in bool reset,       // reset the register
@@ -51,6 +52,12 @@ control register_reset(in opCode_t opCode,  // READ or WRITE
     uint_t reg_val;
 
     apply {
+        if (timer_trigger) {
+            opCode = READ;
+            index = 0;
+            value = 0;
+            reset = false;
+        }
         // Determine the next state (and index if in RESET state)
         @atomic {
             state_reg.read(cur_state, 0);

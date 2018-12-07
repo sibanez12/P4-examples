@@ -26,8 +26,9 @@ const uint_t LOG_NUM_SAMPLES = 6;
  * If the control block has any inputs then default values must be
  * supplied.
  */
-@always(1ns, sample=0)
-control window_avg(in uint_t sample,
+@periodic(1ns)
+control window_avg(in bool timer_trigger,
+                   in uint_t sample,
                    out uint_t result)
 {
     // externs
@@ -39,6 +40,9 @@ control window_avg(in uint_t sample,
     uint_t out_sample;
 
     apply {
+        if (timer_trigger) {
+            sample = 0;
+        }
         /* Note that the @atomic annotation has been modified so that
          * it consumes an input parameter. This input parameter indicates
          * a maximum desired limit on the pipeline depth used for this
