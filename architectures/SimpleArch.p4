@@ -4,6 +4,18 @@
 
 struct sume_meta_t {...}
 
+// This metadata will be set by the architecture each time a Timer
+// event is executed
+struct timer_meta_t {
+    bool timer_trigger;
+    bit<64> timestamp;
+    // The `delay` field tells the architecture how long to wait before
+    // triggering the next Timer event.
+    // The value of this field will be maintained by the architecture across
+    // Timer event triggers and can be modified by the P4 program.
+    bit<64> delay;
+}
+
 // Define the events supported by this architecture
 /*
  * The Ingress event will be invoked by the architecture each time a new
@@ -14,11 +26,12 @@ event Ingress(packet_in p,
               sume_meta_t sume_meta);
 
 /*
- * The InvokePipe and Drop events each define all the inputs required to
+ * The InvokePipe, Drop, and Timer events each define all the inputs required to
  * invoke the Pipe.
  */
 event InvokePipe<H, M>(H headers,
                        M drop_meta,
+                       timer_meta_t timer_meta,
                        sume_meta_t sume_meta);
 /*
  * The Drop event will be invoked by the architecture each time a packet is
@@ -29,7 +42,16 @@ event InvokePipe<H, M>(H headers,
  */
 event Drop<H, M>(H headers,
                  M drop_meta,
+                 timer_meta_t timer_meta,
                  sume_meta_t sume_meta);
+/*
+ * The Timer event will be invoked by the architecture every timer_meta.delay
+ * time intervals.
+ */
+event Timer<H, M>(H headers,
+                  M drop_meta,
+                  timer_meta_t timer_meta,
+                  sume_meta_t sume_meta);
 
 /*
  * The InvokeDeparser event defines all the inputs required to invoke the
@@ -45,9 +67,10 @@ parser Parser<H, M>(packet_in         p,
                     out H             headers,
                     out M             drop_meta);
 
-control Pipe<H, M>(inout H           headers,
-                   inout M           drop_meta,
-                   inout sume_meta_t sume_meta);
+control Pipe<H, M>(inout H            headers,
+                   inout M            drop_meta,
+                   inout timer_meta_t timer_meta,
+                   inout sume_meta_t  sume_meta);
 
 control Deparser<H, M>(in H              headers,
                        in M              drop_meta,
@@ -63,6 +86,7 @@ package SimpleArch<H, M> (Parser<H, M> p,
         Ingress,
         InvokePipe<H,M>,
         Drop<H,M>,
+        Timer<H,M>,
         InvokeDeparser<H,M>
     };
 
@@ -88,11 +112,11 @@ package SimpleArch<H, M> (Parser<H, M> p,
              */
             emit(InvokePipe(p.headers, p.drop_meta, p.sume_meta));
         }
-        if (InvokePipe.isValid() || Drop.isValid()) {
+        if (InvokePipe.isValid() || Drop.isValid() || Timer.isValid()) {
             bool legit_pkt = InvokePipe.isValid();
             // events can be combined using bitwise OR
             // an invalid event will have a bit representation of all 0's
-            map.apply(InvokePipe | Drop);
+            map.apply(InvokePipe | Drop | Timer);
             if (legit_pkt) {
                 // only invoke the deparser for legit packets
                 emit(InvokeDeparser(map.headers, map.drop_meta, map.sume_meta));
