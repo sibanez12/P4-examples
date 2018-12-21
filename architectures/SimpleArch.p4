@@ -110,7 +110,8 @@ package SimpleArch<H, M> (Parser<H, M> p,
              * The new event will become valid once the background thread (created
              * by the above statement) completes.
              */
-            emit(InvokePipe(p.headers, p.drop_meta, p.sume_meta));
+            timer_meta_t timer_meta = {false,0,0};
+            emit(InvokePipe(p.headers, p.drop_meta, timer_meta, p.sume_meta));
         }
         if (InvokePipe.isValid() || Drop.isValid() || Timer.isValid()) {
             bool legit_pkt = InvokePipe.isValid();
