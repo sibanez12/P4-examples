@@ -6,7 +6,9 @@ struct sume_meta_t {...}
 
 // Define the events supported by this architecture
 /*
- * The Ingress event defines all the inputs required to invoke the Parser.
+ * The Ingress event will be invoked by the architecture each time a new
+ * packet arrives.
+ * This event defines all the inputs required to invoke the Parser.
  */
 event Ingress(packet_in p,
               sume_meta_t sume_meta);
@@ -19,6 +21,8 @@ event InvokePipe<H, M>(H headers,
                        M drop_meta,
                        sume_meta_t sume_meta);
 /*
+ * The Drop event will be invoked by the architecture each time a packet is
+ * dropped.
  * The format of the drop_meta bus is defined by the P4 programmer and its
  * fields are populated within the ingress pipeline. The architecture will
  * use this metadata bus to construct Drop events.
